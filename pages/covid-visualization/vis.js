@@ -9,9 +9,9 @@ $(window).resize(function () {
   if (_rawData != null) {
     var new_width = $("#sizer").width();
     if (_client_width != new_width) {
-      render( charts['countries'] );
+      // render( charts['countries'] );
       render( charts['states'] );
-      render( charts['countries-normalized'] );
+      // render( charts['countries-normalized'] );
       render( charts['states-normalized'] );
     }
   }
@@ -83,7 +83,7 @@ function getCookie(cname) {
 // find default state value
 var stored;
 
-var defaultState = "New York";
+var defaultState = "Hawaii";
 if ((stored = getCookie("state")) != "") { defaultState = stored; }
 
 var defaultCountry = "United States";
@@ -92,21 +92,21 @@ if ((stored = getCookie("country")) != "") { defaultCountry = stored; }
 
 // chart metadata
 var charts = {
-  'countries': {
-    reducer: reducer_byCountry,
-    scale: "log",
-    highlight: defaultCountry,
-    y0: 100,
-    xCap: 25,
-    id: "chart-countries",
-    normalizePopulation: false,
-    show: 50,
-    sort: function (d) { return -d.maxCases; },
-    dataSelection: 'cases',
-    showDelta: false,
-    dataSelection_y0: { 'active': 100, 'cases': 100, 'deaths': 10, 'recovered': 100, 'new-cases': 1 },
-    xMax: null, yMax: null, data: null
-  },
+  // 'countries': {
+  //   reducer: reducer_byCountry,
+  //   scale: "log",
+  //   highlight: defaultCountry,
+  //   y0: 100,
+  //   xCap: 25,
+  //   id: "chart-countries",
+  //   normalizePopulation: false,
+  //   show: 50,
+  //   sort: function (d) { return -d.maxCases; },
+  //   dataSelection: 'cases',
+  //   showDelta: false,
+  //   dataSelection_y0: { 'active': 100, 'cases': 100, 'deaths': 10, 'recovered': 100, 'new-cases': 1 },
+  //   xMax: null, yMax: null, data: null
+  // },
   'states': {
     reducer: reducer_byUSstate,
     scale: "log",
@@ -122,20 +122,20 @@ var charts = {
     xMax: null, yMax: null, data: null
   },
 
-  'countries-normalized': {
-    reducer: reducer_byCountry,
-    scale: "log",
-    highlight: defaultCountry,
-    y0: 1,
-    xCap: 25,
-    id: "chart-countries-normalized",
-    normalizePopulation: "country",
-    show: 50,
-    sort: function (d) { return -d.maxCases + -(d.pop / 1e2); },
-    dataSelection: 'cases',
-    dataSelection_y0: { 'active': 1, 'cases': 1, 'deaths': 1, 'recovered': 1 },
-    xMax: null, yMax: null, data: null
-  },
+  // 'countries-normalized': {
+  //   reducer: reducer_byCountry,
+  //   scale: "log",
+  //   highlight: defaultCountry,
+  //   y0: 1,
+  //   xCap: 25,
+  //   id: "chart-countries-normalized",
+  //   normalizePopulation: "country",
+  //   show: 50,
+  //   sort: function (d) { return -d.maxCases + -(d.pop / 1e2); },
+  //   dataSelection: 'cases',
+  //   dataSelection_y0: { 'active': 1, 'cases': 1, 'deaths': 1, 'recovered': 1 },
+  //   xMax: null, yMax: null, data: null
+  // },
   'states-normalized': {
     reducer: reducer_byUSstate,
     scale: "log",
@@ -183,7 +183,7 @@ var prep_data = function(chart) {
 
   if (countries.indexOf(chart.highlight) == -1) {
     if (chart.id.indexOf("states") == -1) { chart.highlight = "United States"; }
-    else { chart.highlight = "New York"; }
+    else { chart.highlight = "Hawaii"; }
   }
 
   $.each(countries, function() {
@@ -319,14 +319,14 @@ var _dataReady = false, _pageReady = false;
 
 var tryRender = function () {
   if (_dataReady && _pageReady) {
-    process_data(_rawData, charts["countries"]);
-    render(charts["countries"]);
+    // process_data(_rawData, charts["countries"]);
+    // render(charts["countries"]);
 
     process_data(_rawData, charts["states"]);
     render(charts["states"]);
     
-    process_data(_rawData, charts["countries-normalized"]);
-    render(charts["countries-normalized"]);
+    // process_data(_rawData, charts["countries-normalized"]);
+    // render(charts["countries-normalized"]);
 
     process_data(_rawData, charts["states-normalized"]);
     render(charts["states-normalized"]);

@@ -53,65 +53,6 @@ title: An interactive visualization of the exponential spread of COVID-19
   <div id="sizer"></div>
   <!-- -->
   <div class="chart-header" style="margin-top: 20px;">
-    <h2>COVID-19 Cases by Country</h2>
-  </div>
-  <div id="chart-countries" class="chart-viz">
-    <div class="text-center" style="height: 500px;"><b>Loading Data...</b></div>
-  </div>
-  <div class="chart-footer">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Highlight:</span>
-          </div>
-          <select class="form-control" id="highlight-chart-countries">
-          </select>
-        </div>
-
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Show:</span>
-          </div>
-          <select class="form-control filter-select" id="filter-chart-countries" data-chart="countries">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50" selected>50</option>
-            <option value="9999">All</option>
-          </select>
-        </div> 
-      </div>
-
-      <div class="col-md-6 text-right">
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Data:</span>
-          </div>
-          <select class="form-control data-select" data-chart="countries">
-            <option value="active">Active Cases</option>
-            <option value="cases" selected>Confirmed Cases</option>
-            <option value="cases-daily">New Cases /Day</option>
-            <option value="deaths">Deaths</option>
-            <option value="recovered">Recovered </option>
-          </select>
-        </div>
-
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Scale:</span>
-          </div>          
-          <label class="btn btn-info active scaleSelection" data-scale="log" data-chart="countries">
-            <input type="radio" name="scale" autocomplete="off" checked> Log Scale
-          </label>
-          <label class="btn btn-info scaleSelection" data-scale="linear" data-chart="countries">
-            <input type="radio" name="scale" autocomplete="off"> Linear Scale
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
-  <!-- -->
-  <div class="chart-header" style="margin-top: 20px;">
     <h2>COVID-19 Cases by US States/Territories</h2>
   </div>
   <div id="chart-states" class="chart-viz">
@@ -187,65 +128,6 @@ title: An interactive visualization of the exponential spread of COVID-19
     </ul>
   </div>
 
-  <!-- -->
-  <div class="chart-header" style="margin-top: 20px;">
-    <h2>COVID-19 Cases by Country, normalized by country population</h2>
-  </div>
-  <div id="chart-countries-normalized" class="chart-viz">
-    <div class="text-center" style="height: 500px;"><b>Loading Data...</b></div>
-  </div>
-  <div class="chart-footer">
-    <div class="row">
-      <div class="col-md-6">
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Highlight:</span>
-          </div>
-          <select class="form-control" id="highlight-chart-countries-normalized">
-          </select>
-        </div>
-
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Show:</span>
-          </div>
-          <select class="form-control filter-select" id="filter-chart-countries-normalized" data-chart="countries-normalized">
-            <option value="10">10</option>
-            <option value="25">25</option>
-            <option value="50" selected>50</option>
-            <option value="9999">All</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="col-md-6 text-right">
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Data:</span>
-          </div>
-          <select class="form-control data-select" data-chart="countries-normalized">
-            <option value="active">Active Cases</option>
-            <option value="cases" selected>Confirmed Cases</option>
-            <option value="cases-daily">New Cases /Day</option>
-            <option value="deaths">Deaths</option>
-            <option value="recovered">Recovered </option>
-          </select>
-        </div>
-
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="padding-bottom: 3px;">
-          <div class="input-group-prepend">
-            <span class="input-group-text">Scale:</span>
-          </div>          
-          <label class="btn btn-info active scaleSelection" data-scale="log" data-chart="countries-normalized">
-            <input type="radio" name="scale" autocomplete="off" checked> Log Scale
-          </label>
-          <label class="btn btn-info scaleSelection" data-scale="linear" data-chart="countries-normalized">
-            <input type="radio" name="scale" autocomplete="off"> Linear Scale
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
   <!-- -->
   <div class="chart-header" style="margin-top: 20px;">
     <h2>COVID-19 Cases by US States/Territories, normalized by population</h2>
