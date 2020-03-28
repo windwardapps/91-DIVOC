@@ -502,7 +502,14 @@ var render = function(chart) {
   var colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 
   // SVG
-  $("#" + chart.id).html("");
+  var $el = $("#" + chart.id);
+  if (!$el.length) {
+    console.info(`Couldn't find #${chart.id}`)
+    return
+  }
+
+  $el.html("");
+
   var svg = d3.select("#" + chart.id)
     .append("svg")
     .attr("width", width + margin.left + margin.right)
