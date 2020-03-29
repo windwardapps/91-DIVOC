@@ -638,7 +638,7 @@ var render = function(chart) {
     .attr("y", height + 32)
     .attr("class", "text-credits")
     .attr("text-anchor", "end")
-    .text(`Data: Johns Hopkins CSSE; Updated: ${_dateUpdated}`);
+    .text(`Data: Johns Hopkins CSSE; Updated: ${_dateUpdated}; Original Site: github.com/wadefagen/91-DIVOC`);
 
   last_index = -1;
   for (var i = 0; i < chart.data.length; i++) {
