@@ -228,7 +228,15 @@ var process_data = function(data, chart) {
     lastDayCases = -1;
     countryData = [];
     var dataIndex = 0;
-    var dates = Object.keys(agg[country])
+    var FORMAT = 'MM-DD-YYYY'
+    var dates = Object.keys(agg[country]).sort(function(a,b) {
+      var da = moment(a, FORMAT).toDate()
+      var db = moment(b, FORMAT).toDate()
+      var ta = da.getTime()
+      var tb = db.getTime()
+      return ta < tb ? -1 : ta > tb ? 1 : 0
+    })
+
     for (var i = 0; i < dates.length; i++) {
       date = dates[i];
       // Start counting days only after the first day w/ 100 cases:
