@@ -1,5 +1,5 @@
 
-path = '../../../../COVID-19/csse_covid_19_data\csse_covid_19_daily_reports/'
+path = '../../../COVID-19/csse_covid_19_data/csse_covid_19_daily_reports/'
 
 
 stateTranslation = [
