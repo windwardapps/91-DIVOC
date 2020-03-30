@@ -307,7 +307,7 @@ var process_data = function(data, chart) {
   return prep_data(chart);
 };
 
-var _dateUpdated = "03/26/2020";
+var _dateUpdated = "3/29/2020";
 var covidData_promise = d3.csv("jhu-data.csv?d=20200329", function (row) {
   row["Active"] = +row["Active"];
   row["Confirmed"] = +row["Confirmed"];
