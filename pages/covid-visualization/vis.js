@@ -244,6 +244,20 @@ var process_data = function(data, chart) {
       var cases = agg[country][date][chart.dataSelection];
       if (chart.normalizePopulation) { cases = (cases / popSize) * 1e6; }
 
+      if (chart.showDelta) {
+        if (i == 0) { cases = 0; }
+        else {
+          prevCases = agg[country][dates[i - 1]][chart.dataSelection];
+          if (chart.normalizePopulation) {
+            cases = agg[country][date][chart.dataSelection];
+            cases = cases - prevCases;
+            cases = (cases / popSize) * 1e6;
+          } else {
+            cases = cases - prevCases;
+          }
+        }
+      }
+
       if (dayCounter == -1 && cases >= chart.y0) {
         dayCounter = 0;
       }
@@ -251,16 +265,8 @@ var process_data = function(data, chart) {
       
       // Once we start counting days, add data
       if (dayCounter > -1) {
-        if (chart.showDelta) {
-          if (i == 0) { cases = 0; }
-          else {
-            prevCases = agg[country][dates[i - 1]][chart.dataSelection];
-            if (chart.normalizePopulation) { prevCases = (prevCases / popSize) * 1e6; }
-            cases = cases - prevCases;
-          }
-        }
-
-        if (cases >= chart.y0 || (chart.showDelta && cases > 1)) {
+        //if (cases >= chart.y0 || (chart.showDelta && cases > 1)) {
+        if (cases >= chart.y0 || chart.showDelta) {
           countryData.push({
             pop: popSize,
             country: country,
@@ -270,8 +276,10 @@ var process_data = function(data, chart) {
             i: dataIndex++
           });
 
-          lastDayCases = cases;
-          maxDay = dayCounter;
+          if (!(chart.showDelta && cases < 1)) {
+            lastDayCases = cases;
+            maxDay = dayCounter;  
+          }
         }
         if (cases > maxCases) { maxCases = cases; }
 
@@ -307,8 +315,8 @@ var process_data = function(data, chart) {
   return prep_data(chart);
 };
 
-var _dateUpdated = "3/29/2020";
-var covidData_promise = d3.csv("jhu-data.csv?d=20200329", function (row) {
+var _dateUpdated = "03/30/2020";
+var covidData_promise = d3.csv("jhu-data.csv?d=20200330", function (row) {
   row["Active"] = +row["Active"];
   row["Confirmed"] = +row["Confirmed"];
   row["Recovered"] = +row["Recovered"];
@@ -329,19 +337,22 @@ var tryRender = function () {
   if (_dataReady && _pageReady) {
     // process_data(_rawData, charts["countries"]);
     // render(charts["countries"]);
-
-    process_data(_rawData, charts["states"]);
-    render(charts["states"]);
-    
-    // process_data(_rawData, charts["countries-normalized"]);
-    // render(charts["countries-normalized"]);
-
-    process_data(_rawData, charts["states-normalized"]);
-    render(charts["states-normalized"]);
-
-    _intial_load = false;
+    setTimeout(initialRender2, 100);
   }
 }
+
+var initialRender2 = function() {
+  process_data(_rawData, charts["states"]);
+  render(charts["states"]);
+  
+  // process_data(_rawData, charts["countries-normalized"]);
+  // render(charts["countries-normalized"]);
+
+  process_data(_rawData, charts["states-normalized"]);
+  render(charts["states-normalized"]);
+
+  _intial_load = false;
+};
 
 
 
@@ -392,7 +403,6 @@ $(function() {
   });
 
   $(".data-select").change(function (e) {
-    console.log("Data select: ")
     var chartId = $(e.target).data("chart");
     var chart = charts[chartId];
     var value = $(e.target).val();
@@ -429,17 +439,23 @@ var tip_html = function(chart) {
     if (d.i >= 2) {
       let d0 = gData[i - 1];
       let ggrowth = Math.pow(d.cases / d0.cases, 1 / (d.dayCounter - d0.dayCounter));
-      geoGrowth.push(`Previous day: <b>${ggrowth.toFixed(2)}x</b> growth`);
+      if (isFinite(ggrowth)) {
+        geoGrowth.push(`Previous day: <b>${ggrowth.toFixed(2)}x</b> growth`);
+      }
     }
     if (d.i >= 8) {
       let d0 = gData[i - 7];
       let ggrowth = Math.pow(d.cases / d0.cases, 1 / (d.dayCounter - d0.dayCounter));
-      geoGrowth.push(`Previous week: <b>${ggrowth.toFixed(2)}x</b> /day`);
+      if (isFinite(ggrowth)) {
+        geoGrowth.push(`Previous week: <b>${ggrowth.toFixed(2)}x</b> /day`);
+      }
     }
     if (d.i > 0) {
       let d0 = gData[0];
       let ggrowth = Math.pow(d.cases / d0.cases, 1 / (d.dayCounter - d0.dayCounter));
-      geoGrowth.push(`Previous ${d.dayCounter} days: <b>${ggrowth.toFixed(2)}x</b> /day`);
+      if (isFinite(ggrowth)) {
+        geoGrowth.push(`Previous ${d.dayCounter} days: <b>${ggrowth.toFixed(2)}x</b> /day`);
+      }
     }
 
     var s2 = "";
@@ -468,7 +484,18 @@ var tip_html = function(chart) {
 };
 
 var render = function(chart) {
+  data_y0 = chart.y0;
+  gData = undefined;
+  var f = _.find(chart.data, function (e) { return e.country == chart.highlight })
+  if (f && (gData = f.data) && gData[0]) {
+    if (gData[0].cases) { data_y0 = gData[0].cases; }
+  }
+
   var maxDayRendered = chart.xMax;
+  if (f && f.maxDay > maxDayRendered) {
+    maxDayRendered = f.maxDay + 3;
+  }
+
   var margin = { top: 10, right: 20, bottom: 40, left: 60 };
 
   var cur_width = $("#sizer").width();
@@ -495,15 +522,9 @@ var render = function(chart) {
 
   scale_y0 = chart.y0;
   if (chart.showDelta) {
-    var f = _.find(chart.data, function (e) { return e.country == chart.highlight })
-    
-    if (f) {
-      var gData = f.data;
-      if (gData && gData[0] && gData[0].cases) {
-        scale_y0 = gData[0].cases;
-      }
-    }
+    scale_y0 = 1;
   }
+
   casesScale.domain([scale_y0, chart.yMax]).range([height, 0]);
   
   // Color Scale
@@ -572,40 +593,92 @@ var render = function(chart) {
 
   // Add Data
   // Create 35%-line
-  var cases = scale_y0, day = 0;
-  var pctLine = [];
-  while (cases < 2 * chart.yMax) {
-    pctLine.push({
-      dayCounter: day,
-      cases: cases
-    })
+  let scaleLinesMeta = [
+    {
+      label: "35% daily",
+      sLabel: "35%",
+      gRate: 1.35,
+      color: '#ccc'
+    },
+    {
+      label: "Double every 2 days",
+      sLabel: "Double every 2 days",
+      gRate: Math.pow(2, 1/2)
+    },
+    {
+      label: "Double every 3 days",
+      sLabel: "2x /3 days",
+      gRate: Math.pow(2, 1/3)
+    },
+    {
+      label: "Double every week",
+      sLabel: "2x /week",
+      gRate: Math.pow(2, 1/7)
+    },
+    {
+      label: "Double every two weeks",
+      sLabel: "2x /2 weeks",
+      gRate: Math.pow(2, 1/14)
+    }
+  ]
 
-    day++;
-    cases *= 1.35;
+  for (var scaleLineMeta of scaleLinesMeta) {
+    var cases = data_y0, day = 0, xMax_y = -1;
+    var pctLine = [];
+    while (cases < 2 * chart.yMax) {
+      pctLine.push({
+        dayCounter: day,
+        cases: cases
+      })
+
+      if (day == chart.xMax) {
+        xMax_y = cases;
+      }
+  
+      day++;
+      cases *= scaleLineMeta.gRate;
+    }
+  
+    svg.datum(pctLine)
+      .append("path")
+      .attr("fill", "none")
+      .attr("stroke", function() {
+        if (scaleLineMeta.color) { return scaleLineMeta.color; }
+        else { return "black"; }
+      })
+      .attr("stroke-width", 2)
+      .attr("stroke-dasharray", 12)
+      .attr("d", d3.line()
+        .x(function (d) { return daysScale(d.dayCounter); })
+        .y(function (d) { return casesScale(d.cases); })
+      );
+  
+    svg.append("text")
+      .attr("fill", colorScale(i))
+      .attr("class", "label-country")
+      .attr("x", function() {
+        if (xMax_y == -1) {
+          return daysScale( Math.log( chart.yMax / data_y0 ) ) / Math.log( scaleLineMeta.gRate ) - ((isSmall)?10:25);
+        } else {
+          return daysScale( Math.log( xMax_y / data_y0 ) ) / Math.log( scaleLineMeta.gRate ) + 10;
+        }
+      })
+      .attr("y", function () {
+        if (xMax_y == -1) { return casesScale( chart.yMax ) + 12; }
+        else { return casesScale( xMax_y ) - 5; }
+      })
+      .attr("text-anchor", "end")
+      .attr("fill", function() {
+        if (scaleLineMeta.color) { return scaleLineMeta.color; }
+        else { return "black"; }
+      })
+      .text(function() {
+        //if (growthLineLabel_x >= width - 50) { return ""; }
+        return (!isSmall) ? scaleLineMeta.label : scaleLineMeta.sLabel;
+      })
   }
+  
 
-  svg.datum(pctLine)
-    .append("path")
-    .attr("fill", "none")
-    .attr("stroke", "black")
-    .attr("stroke-width", 2)
-    .attr("stroke-dasharray", 12)
-    .attr("d", d3.line()
-      .x(function (d) { return daysScale(d.dayCounter); })
-      .y(function (d) { return casesScale(d.cases); })
-    );
-
-  growthLineLabel_x = daysScale( Math.log( chart.yMax / chart.y0 ) ) / Math.log( 1.35 ) + 2;
-  svg.append("text")
-    .attr("fill", colorScale(i))
-    .attr("class", "label-country")
-    .attr("x", growthLineLabel_x)
-    .attr("y", casesScale( chart.yMax ) + 12 )
-    .attr("fill", "black")
-    .text(function() {
-      if (growthLineLabel_x >= width - 50) { return ""; }
-      return (!isSmall) ? "1.35x daily growth" : "1.35x daily";
-    })
 
   var xAxisLabel = `Days since ${chart.y0} `
   if (chart.dataSelection == 'cases') { xAxisLabel += "case"; if (chart.y0 != 1) { xAxisLabel += "s"; }}
@@ -675,6 +748,9 @@ var render = function(chart) {
       .attr("d", d3.line()
         .x(function (d) { return daysScale(d.dayCounter); })
         .y(function (d) { return casesScale(d.cases); })
+        .defined(function (d, i, a) {
+          return (d.cases >= 1);
+        })
       );
 
     svg.selectAll("countries")
@@ -682,12 +758,16 @@ var render = function(chart) {
       .enter()
       .append("circle")
       .attr("cx", function (d) { return daysScale(d.dayCounter); } )
-      .attr("cy", function (d) { return casesScale(d.cases); } )
+      .attr("cy", function (d) {
+        if (d.cases < 1) { return -999; }
+        return casesScale(d.cases);
+      } )
       .style("opacity", function (d) {
         if (d.country == chart.highlight) { return 1; }
         else { return 0.3; }
       })
       .attr("r", function (d) {
+        if (d.cases < 1) { return 0; }
         if (d.country == chart.highlight) { return 4; }
         else { return 3; }
       })
@@ -708,7 +788,7 @@ var render = function(chart) {
       })
       .text(countryData.country);
 
-    if (countryData.maxDay < maxDayRendered) { 
+    if (countryData.maxDay + 2 < maxDayRendered || !countryData.data[maxDayRendered - 1]) { 
       countryText
         .attr("x", 5 + daysScale(countryData.maxDay) )
         .attr("y", casesScale(countryData.lastDayCases) )
