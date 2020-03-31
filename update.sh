@@ -8,6 +8,7 @@ popd
 cd pages/covid-visualization
 python3 processData.py
 python3 processUrls.py
+rm -rf _site/env
 bundle exec jekyll build
 
 echo "[$(date "+%Y-%m-%dT%H:%M:%S")] end"
