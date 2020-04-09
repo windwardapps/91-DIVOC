@@ -3,6 +3,7 @@ var _popData = null;
 var dateColumns = [];
 var _client_width = -1;
 var _intial_load = true;
+var showOnlyHighlightedState = true;
 
 // Resize
 $(window).resize(function () {
@@ -423,6 +424,16 @@ $(function() {
     render(chart);
   });
 
+  $("#toggle-states").on('click', function(e) {
+    showOnlyHighlightedState = !showOnlyHighlightedState;
+    var verb = showOnlyHighlightedState ? 'Show' : 'Hide';
+    var text = verb + ' other states';
+    $(e.target).text(text).blur();
+    var chartId = $(e.target).data("chart");
+    var chart = charts[chartId];
+    render(chart);
+  })
+
   _pageReady = true;
   tryRender();
 });
@@ -801,8 +812,10 @@ var render = function(chart) {
     }
   };
 
-  for (var i = 0; i < chart.data.length; i++) {
-    if (i != last_index) { renderLineChart(svg, i); }
+  if (last_index > -1 && !showOnlyHighlightedState) {
+    for (var i = 0; i < chart.data.length; i++) {
+      if (i != last_index) { renderLineChart(svg, i); }
+    }
   }
 
   if (last_index != -1) {
